@@ -56,10 +56,17 @@ testing_subgroup = training[-subgroups,]
 
 # use random forest to build the predictive model
 modelFit <- randomForest(classe ~., data = training_subgroup, do.trace = 10)
+```
+```{r, echo=FALSE}
 modelFit
+```
+
+```{r}
 
 # predict outcome using the testing data and generate confusion matrix to see model perforamce
 prediction <- predict(modelFit, testing_subgroup, type = 'class')
+```
+```{r, echo=FALSE}
 confusionMatrix(prediction, testing_subgroup$classe)
 ```
 
@@ -71,6 +78,8 @@ Get predictions and evaluate.
 
 ```{r}
 answers <- predict(modelFit, testing)
+```
+```{r, echo=FALSE}
 answers
 
 ```
