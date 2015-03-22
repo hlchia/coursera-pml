@@ -1,0 +1,92 @@
+---
+title: 'Coursera: Practical Machine Learning Prediction Assignment'
+author: "Chia Hock Lai [GitHub](https://github.com/hlchia)"
+output:
+  html_document:
+    keep_md: yes
+    toc: yes
+---
+## Introduction
+The objective of this assignment is to build a machine learning model to predict the class of exercise performed based an a variety of measurements, given a training file for building the algorithm and a testing file to make the predictions.
+
+
+## Prepare the datasets
+
+It is assumed that the training and testing data has been downloaded to the local working directory.
+
+First is to read the training and testing data while standardizing the treament of non-valid entries (blanks, DIV/0, NA) as NA, so that it is easier to transform the data, if necessary, later.
+
+```{r}
+setwd("/Users/hlchia/Documents/data/pml")
+# convert invalid values to NAs
+training <- read.csv(file = "pml-training.csv", na.strings=c("NA","#DIV/0!","", "NULL"))
+testing <- read.csv(file = "pml-testing.csv", na.strings=c("NA","#DIV/0!","", "NULL"))
+```
+
+Initial study of the loaded training data structure showed that there were 19,622 records and 160 variables, many variables contain only NAs values, and the first 7 columns ("X", "user_name" etc) do not seem to be relevant in building the model. Therefore the following transformations were performed to remove variables that contain only NAs, and the first 7 columns
+
+```{r}
+## clean the data - remove columns that are all NAs ie mean is zero
+training <- training[,colMeans(is.na(training)) == 0] 
+## clean the data - first 7 cols seem not relevant
+training <- training[,-(1:7)] 
+dim(training) # 19,622 obs and 53 variables
+```
+
+After the data transformation, only 53 variables remained. The process wass repeated on the training data so that it could be used for prediction later.
+
+```{r}
+testing <- testing[,colMeans(is.na(testing)) == 0] 
+testing <- testing[,-(1:7)] 
+dim(testing) # 20 obs and 53 variables
+```
+
+## Train model using training data
+
+For cross validation purposes, we split our testing data into sub groups of ratio 60:40, and used random forest to perform the training since it is usually one of the more effective methods when there are many variables and their interactions are unknown. We would use another method if the model performance was not satisfactory. 
+
+```{r}
+library(caret)
+library(randomForest)
+
+set.seed(12345)
+subgroups = createDataPartition(y = training$classe, p = 0.6, list = FALSE)
+training_subgroup = training[subgroups, ]
+testing_subgroup = training[-subgroups,]
+
+# use random forest to build the predictive model
+modelFit <- randomForest(classe ~., data = training_subgroup, do.trace = 10)
+modelFit
+
+# predict outcome using the testing data and generate confusion matrix to see model perforamce
+prediction <- predict(modelFit, testing_subgroup, type = 'class')
+confusionMatrix(prediction, testing_subgroup$classe)
+```
+
+The model performed very well with an accuracy rate of 99.45%. In other words, the out of sample error was very low at 0.55%, with a 95% confidence interval of 0.44% to 0.80%.
+
+## Predict on the testing data
+
+Get predictions and evaluate.
+
+```{r}
+answers <- predict(modelFit, testing)
+answers
+
+```
+
+## Submission to Coursera
+
+Write submission files to `predictionAssignment_files/answers`.
+
+```{r}
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+
+pml_write_files(answers)
+```
