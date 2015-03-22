@@ -160,7 +160,6 @@ modelFit &lt;- randomForest(classe ~., data = training_subgroup, do.trace = 10)<
 ##   480:   0.65%  0.12%  1.01%  0.49%  1.50%  0.51%
 ##   490:   0.66%  0.15%  1.01%  0.44%  1.55%  0.51%
 ##   500:   0.66%  0.15%  1.01%  0.44%  1.55%  0.51%</code></pre>
-<pre class="r"><code>modelFit</code></pre>
 <pre><code>## 
 ## Call:
 ##  randomForest(formula = classe ~ ., data = training_subgroup,      do.trace = 10) 
@@ -177,8 +176,7 @@ modelFit &lt;- randomForest(classe ~., data = training_subgroup, do.trace = 10)<
 ## D    0    0   27 1900    3 0.015544041
 ## E    0    0    3    8 2154 0.005080831</code></pre>
 <pre class="r"><code># predict outcome using the testing data and generate confusion matrix to see model perforamce
-prediction &lt;- predict(modelFit, testing_subgroup, type = 'class')
-confusionMatrix(prediction, testing_subgroup$classe)</code></pre>
+prediction &lt;- predict(modelFit, testing_subgroup, type = 'class')</code></pre>
 <pre><code>## Confusion Matrix and Statistics
 ## 
 ##           Reference
@@ -215,8 +213,7 @@ confusionMatrix(prediction, testing_subgroup$classe)</code></pre>
 <div id="predict-on-the-testing-data" class="section level2">
 <h2>Predict on the testing data</h2>
 <p>Get predictions and evaluate.</p>
-<pre class="r"><code>answers &lt;- predict(modelFit, testing)
-answers</code></pre>
+<pre class="r"><code>answers &lt;- predict(modelFit, testing)</code></pre>
 <pre><code>##  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 
 ##  B  A  B  A  A  E  D  B  A  A  B  C  B  A  E  E  A  B  B  B 
 ## Levels: A B C D E</code></pre>
